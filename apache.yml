@@ -1,0 +1,32 @@
+- name: Configure Apache web server
+  hosts: all
+  tasks:
+          - name: Install package
+            package:
+                    name: "httpd"
+                    state: present
+            register: x
+          - debug:
+                  var: x
+          - name: Copy web pages
+            copy:
+                    src: "/ansible_scripts/sample.html"
+                    dest: "/var/www/html/"
+            notify: Start services
+  handlers:
+          - name: Start services
+            service:
+                    name: "httpd"
+                    state: restarted
+            register: z
+          - debug:
+                  var: z
+          - name: Firewall
+            firewalld:
+                    port: "8080/tcp"
+                    state: enabled
+                    permanent: yes
+                    immediate: yes
+            register: q
+          - debug:
+                  var: q
